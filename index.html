@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Solaris Power | Dealer Intelligence Dashboard</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="page-shell">
+      <header class="hero">
+        <div class="hero-copy-block" id="heroMarketingBlock">
+          <p class="eyebrow">Solaris Power Dealer Intelligence</p>
+          <h1>Puerto Rico, ventas, expansión y riesgos en una sola vista.</h1>
+          <p class="hero-copy">
+            Dashboard interactivo para data entry, seguimiento de KPIs, toma de
+            decisiones y visualización territorial por municipio.
+          </p>
+          <div class="hero-badges">
+            <span class="status-pill">Arranque en cero</span>
+            <span class="status-pill">Entrada manual</span>
+            <span class="status-pill">Mapa por municipio</span>
+            <span class="status-pill">Radar de riesgos</span>
+          </div>
+        </div>
+
+        <div class="hero-panel">
+          <div class="hero-panel-top">
+            <div>
+              <p class="hero-panel-label">Modo de análisis</p>
+              <div class="segmented" id="viewModeSwitch">
+                <button class="active" data-view="executive">Ejecutivo</button>
+                <button data-view="sales">Ventas</button>
+                <button data-view="expansion">Expansión</button>
+              </div>
+            </div>
+            <div class="brand-sun">
+              <span></span>
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+          </div>
+          <p class="hero-panel-note" id="viewModeDescription">
+            Estado general del dealer: facturación, cobertura, talento,
+            penetración y salud del negocio.
+          </p>
+          <div class="hero-stats">
+            <div>
+              <small>Estado</small>
+              <strong id="datasetState">Sin registros</strong>
+            </div>
+            <div>
+              <small>Meta activa</small>
+              <strong id="activeGoalState">$0</strong>
+            </div>
+          </div>
+          <div class="auth-card">
+            <div class="card-header compact">
+              <div>
+                <p class="card-kicker">Acceso Ejecutivo</p>
+                <h2>Login y sincronización compartida</h2>
+              </div>
+              <span class="status-pill" id="cloudModeBadge">Modo local</span>
+            </div>
+            <p class="microcopy" id="authStatusText">
+              Puedes usar la app localmente. Cuando configures Supabase, este bloque permitirá acceso compartido por login.
+            </p>
+            <div id="authSignedOut" class="auth-state">
+              <div class="field-group">
+                <label for="authEmailInput">Email de acceso</label>
+                <input
+                  id="authEmailInput"
+                  type="email"
+                  placeholder="ejecutivo@solarispower.com"
+                />
+                <small class="field-help">
+                  Envía un magic link para entrar sin contraseña.
+                </small>
+              </div>
+              <button id="sendMagicLinkButton">Enviar acceso</button>
+            </div>
+            <div id="authSignedIn" class="auth-state hidden">
+              <div class="auth-session">
+                <div>
+                  <small>Usuario</small>
+                  <strong id="authUserEmail">-</strong>
+                </div>
+                <div>
+                  <small>Rol</small>
+                  <strong id="authUserRole">-</strong>
+                </div>
+              </div>
+              <div class="auth-actions">
+                <button id="syncNowButton" class="secondary-button">Sincronizar</button>
+                <button id="signOutButton" class="secondary-button">Cerrar sesión</button>
+              </div>
+            </div>
+            <small id="authMessage" class="field-help">
+              El modo compartido requiere configuración de Supabase.
+            </small>
+          </div>
+        </div>
+      </header>
+
+      <section id="loginGate" class="login-gate hidden">
+        <div class="login-gate-card">
+          <div class="login-orb orb-a"></div>
+          <div class="login-orb orb-b"></div>
+          <div class="login-gridlines"></div>
+          <div class="login-gate-grid">
+            <div class="login-gate-copy">
+              <p class="eyebrow">Solaris Power Executive Access</p>
+              <h2>Inicia sesión para entrar al centro de inteligencia comercial.</h2>
+              <p class="hero-copy">
+                Este entorno contiene ventas, expansión territorial, metas KPI,
+                roles, auditoría y decisiones estratégicas. El contenido solo se
+                muestra a usuarios autenticados.
+              </p>
+              <div class="login-gate-highlight">
+                <span class="login-highlight-line"></span>
+                <div>
+                  <strong>Portal Ejecutivo Solaris Power</strong>
+                  <p>
+                    Diseñado para liderazgo, expansión disciplinada y toma de
+                    decisiones con visibilidad territorial en tiempo real.
+                  </p>
+                </div>
+              </div>
+              <div class="login-gate-quote">
+                <strong>Una empresa familiar con visión ejecutiva.</strong>
+                <p>
+                  Diseñado para liderazgo comercial, seguimiento territorial y
+                  decisiones de crecimiento en Puerto Rico y Florida.
+                </p>
+              </div>
+              <div class="login-gate-badges">
+                <span class="status-pill">Dashboard compartido</span>
+                <span class="status-pill">Roles por usuario</span>
+                <span class="status-pill">Historial auditado</span>
+                <span class="status-pill">Datos centralizados</span>
+              </div>
+            </div>
+            <div class="login-gate-panel">
+              <div class="login-brand-wrap">
+                <img
+                  class="login-brand-image"
+                  src="assets/solaris-power-branding.png"
+                  alt="Solaris Power"
+                />
+              </div>
+              <div class="login-gate-note">
+                <strong>Acceso protegido</strong>
+                <p>
+                  Usa tu correo corporativo para recibir el magic link. Una vez
+                  adentro podrás ver el dashboard según el rol asignado por el
+                  administrador.
+                </p>
+              </div>
+              <div class="login-panel-stat">
+                <div>
+                  <small>Entorno</small>
+                  <strong>Executive Portal</strong>
+                </div>
+                <div>
+                  <small>Seguridad</small>
+                  <strong>Magic Link + Roles</strong>
+                </div>
+              </div>
+              <div class="login-panel-stat">
+                <div>
+                  <small>Mercados</small>
+                  <strong>Puerto Rico + Florida</strong>
+                </div>
+                <div>
+                  <small>Enfoque</small>
+                  <strong>KPI, riesgo y expansión</strong>
+                </div>
+              </div>
+              <div class="login-gate-checklist">
+                <div class="login-check">Ventas y puntos físicos</div>
+                <div class="login-check">Metas y milestones</div>
+                <div class="login-check">Riesgos y auditoría</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <main class="dashboard" id="dashboardMain">
+        <section class="topbar">
+          <div class="filter-card">
+            <label for="regionSelect">Región</label>
+            <select id="regionSelect">
+              <option value="puerto-rico">Puerto Rico</option>
+              <option value="florida">Florida</option>
+            </select>
+          </div>
+          <div class="filter-card">
+            <label for="periodSelect">Periodo</label>
+            <select id="periodSelect">
+              <option value="2026-all">2026 completo</option>
+              <option value="2026-Q1">2026 · Q1</option>
+              <option value="2026-Q2">2026 · Q2</option>
+              <option value="2026-Q3">2026 · Q3</option>
+              <option value="2026-Q4">2026 · Q4</option>
+              <option value="2027-all">2027 completo</option>
+              <option value="2027-Q1">2027 · Q1</option>
+              <option value="2027-Q2">2027 · Q2</option>
+              <option value="2027-Q3">2027 · Q3</option>
+              <option value="2027-Q4">2027 · Q4</option>
+            </select>
+          </div>
+          <div class="filter-card">
+            <label for="metricSelect">Métrica del mapa</label>
+            <select id="metricSelect">
+              <option value="revenue">Ingresos</option>
+              <option value="units">Unidades</option>
+              <option value="avgTicket">Ticket promedio</option>
+              <option value="coverage">Productos activos</option>
+              <option value="presence">Puntos físicos</option>
+              <option value="leaders">Líderes</option>
+              <option value="sellers">Vendedores</option>
+              <option value="sellerProductivity">Ventas por vendedor</option>
+            </select>
+          </div>
+          <div class="filter-card wide">
+            <label>Productos monitoreados</label>
+            <div class="chip-group" id="productChips"></div>
+          </div>
+        </section>
+
+        <section class="kpi-grid" id="kpiGrid"></section>
+
+        <section class="workspace">
+          <article class="map-card">
+            <div class="card-header">
+              <div>
+                <p class="card-kicker">Mapa interactivo</p>
+                <h2>Tablero territorial de Puerto Rico</h2>
+              </div>
+              <div class="legend-block">
+                <span>Leyenda de intensidad</span>
+                <div class="legend-scale" id="legendScale"></div>
+              </div>
+            </div>
+            <div class="map-frame">
+              <svg
+                id="mapSvg"
+                viewBox="0 0 1000 650"
+                aria-label="Mapa de Puerto Rico por municipios"
+              ></svg>
+              <div class="tooltip" id="mapTooltip" hidden></div>
+            </div>
+            <div class="map-footer">
+              <span>
+                El color muestra la métrica seleccionada. Los íconos muestran
+                oficinas, kioskos y showrooms.
+              </span>
+            </div>
+          </article>
+
+          <aside class="side-panel">
+            <article class="detail-card">
+              <div class="card-header compact">
+                <div>
+                  <p class="card-kicker">Detalle municipal</p>
+                  <h2 id="detailTitle">Selecciona un territorio</h2>
+                </div>
+              </div>
+              <div id="detailContent" class="detail-content">
+                <p>
+                  Haz clic sobre un territorio para ver KPI, estructura comercial
+                  y oportunidad de desarrollo.
+                </p>
+              </div>
+            </article>
+
+            <article class="detail-card">
+              <div class="card-header compact">
+                <div>
+                  <p class="card-kicker">Entrada de ventas</p>
+                  <h2>Añadir registro comercial</h2>
+                </div>
+              </div>
+              <div class="data-form">
+                <div class="advisor-note">
+                  <strong>Cómo usar esta sección</strong>
+                  <div>
+                    Registra una venta indicando dónde ocurrió, qué producto se
+                    vendió, en qué mes y cuál fue su impacto en unidades e ingresos.
+                  </div>
+                </div>
+                <div class="field-group">
+                  <label for="salesMunicipalitySelect">Territorio</label>
+                  <select id="salesMunicipalitySelect"></select>
+                  <small class="field-help">Municipio o condado donde ocurrió la venta o donde se cerró el negocio.</small>
+                </div>
+                <div class="field-group">
+                  <label for="salesProductSelect">Producto</label>
+                  <select id="salesProductSelect">
+                    <option value="Ritello">Vacuum Ritello</option>
+                    <option value="Placas Solares">Sistemas de Placas Solares</option>
+                    <option value="Sistemas de Agua">Sistemas de Agua</option>
+                    <option value="Baterias">Baterías</option>
+                  </select>
+                  <small class="field-help">Selecciona cuál de los productos fue vendido.</small>
+                </div>
+                <div class="split-fields">
+                  <div class="field-group">
+                    <label for="salesYearSelect">Año</label>
+                    <select id="salesYearSelect">
+                      <option value="2026">2026</option>
+                      <option value="2027">2027</option>
+                    </select>
+                    <small class="field-help">Año al que pertenece esa venta dentro del dashboard.</small>
+                  </div>
+                  <div class="field-group">
+                    <label for="salesMonthSelect">Mes</label>
+                    <select id="salesMonthSelect"></select>
+                    <small class="field-help">Mes en el que esa venta debe contarse dentro del periodo.</small>
+                  </div>
+                </div>
+                <div class="split-fields">
+                  <div class="field-group">
+                    <label for="salesUnitsInput">Unidades</label>
+                    <input id="salesUnitsInput" type="number" min="0" value="0" placeholder="Ej. 3" />
+                    <small class="field-help">Cantidad de unidades vendidas en ese registro.</small>
+                  </div>
+                </div>
+                <div class="field-group">
+                  <label for="salesRevenueInput">Ingresos</label>
+                  <input id="salesRevenueInput" type="number" min="0" value="0" placeholder="Ej. 45000" />
+                  <small class="field-help">Monto total de dinero generado por esa venta.</small>
+                </div>
+                <button id="addSalesButton">Guardar registro</button>
+                <p class="microcopy">
+                  El dashboard comienza en cero para que ustedes hagan el data
+                  entry desde el primer día.
+                </p>
+              </div>
+            </article>
+
+            <article class="detail-card">
+              <div class="card-header compact">
+                <div>
+                  <p class="card-kicker">Expansión comercial</p>
+                  <h2>Añadir oficina, kiosko o showroom</h2>
+                </div>
+              </div>
+              <div class="data-form">
+                <div class="advisor-note">
+                  <strong>Cómo usar esta sección</strong>
+                  <div>
+                    Registra un nuevo punto físico y la capacidad humana que
+                    tendrá en ese municipio.
+                  </div>
+                </div>
+                <div class="field-group">
+                  <label for="locationNameInput">Nombre del punto</label>
+                  <input id="locationNameInput" type="text" placeholder="Ej. Showroom Plaza Carolina" />
+                  <small class="field-help">Nombre interno o comercial del punto que vas a abrir.</small>
+                </div>
+                  <div class="field-group">
+                    <label for="locationTypeSelect">Tipo de punto</label>
+                  <select id="locationTypeSelect">
+                    <option value="Oficina">Oficina</option>
+                    <option value="Kiosko">Kiosko</option>
+                    <option value="Showroom">Showroom</option>
+                  </select>
+                  <small class="field-help">Selecciona si el punto será oficina, kiosko o showroom.</small>
+                </div>
+                <div class="field-group">
+                  <label for="locationMunicipalitySelect">Territorio</label>
+                  <select id="locationMunicipalitySelect"></select>
+                  <small class="field-help">Municipio o condado donde operará ese punto físico.</small>
+                </div>
+                <div class="split-fields">
+                  <div class="field-group">
+                    <label for="leadersInput">Líderes</label>
+                    <input id="leadersInput" type="number" min="0" value="0" placeholder="Ej. 2" />
+                    <small class="field-help">Cantidad de supervisores o líderes que manejarán ese punto.</small>
+                  </div>
+                  <div class="field-group">
+                    <label for="sellersInput">Vendedores</label>
+                    <input id="sellersInput" type="number" min="0" value="0" placeholder="Ej. 8" />
+                    <small class="field-help">Cantidad de vendedores activos asignados a ese punto.</small>
+                  </div>
+                </div>
+                <button id="addLocationButton">Añadir al mapa</button>
+              </div>
+            </article>
+
+            <article class="detail-card">
+              <div class="card-header compact">
+                <div>
+                  <p class="card-kicker">Objetivos</p>
+                  <h2>Configurar metas KPI</h2>
+                </div>
+              </div>
+              <div class="data-form">
+                <div class="advisor-note">
+                  <strong>Cómo usar esta sección</strong>
+                  <div>
+                    Define aquí las metas del periodo para que el dashboard mida
+                    progreso, brechas y próximos pasos recomendados.
+                  </div>
+                </div>
+                <div class="split-fields">
+                  <div class="field-group">
+                    <label for="targetRevenueInput">Meta de ingresos</label>
+                    <input id="targetRevenueInput" type="number" min="0" value="0" placeholder="Ej. 500000" />
+                    <small class="field-help">Total en ventas que quieren alcanzar en el periodo.</small>
+                  </div>
+                  <div class="field-group">
+                    <label for="targetUnitsInput">Meta de unidades</label>
+                    <input id="targetUnitsInput" type="number" min="0" value="0" placeholder="Ej. 120" />
+                    <small class="field-help">Cantidad total de productos vendidos que quieren lograr.</small>
+                  </div>
+                </div>
+                <div class="split-fields">
+                  <div class="field-group">
+                    <label for="targetLocationsInput">Meta de puntos físicos</label>
+                    <input id="targetLocationsInput" type="number" min="0" value="0" placeholder="Ej. 8" />
+                    <small class="field-help">Número de oficinas, kioskos o showrooms que quieren tener.</small>
+                  </div>
+                  <div class="field-group">
+                    <label for="targetSellersInput">Meta de vendedores</label>
+                    <input id="targetSellersInput" type="number" min="0" value="0" placeholder="Ej. 40" />
+                    <small class="field-help">Cantidad de vendedores activos que necesita la operación.</small>
+                  </div>
+                </div>
+                <button id="saveTargetsButton">Guardar metas</button>
+              </div>
+            </article>
+          </aside>
+        </section>
+
+        <section class="bottom-grid">
+          <article class="panel-card">
+            <div class="card-header compact">
+              <div>
+                <p class="card-kicker">Tendencia</p>
+                <h2>Ingresos mensuales</h2>
+              </div>
+            </div>
+            <div id="trendChart" class="trend-chart"></div>
+          </article>
+
+          <article class="panel-card">
+            <div class="card-header compact">
+              <div>
+                <p class="card-kicker">Decisiones</p>
+                <h2>Municipios a priorizar</h2>
+              </div>
+            </div>
+            <div id="opportunityTable" class="opportunity-table"></div>
+          </article>
+        </section>
+
+        <section class="intelligence-grid">
+          <article class="panel-card">
+            <div class="card-header compact">
+              <div>
+                <p class="card-kicker">Cockpit KPI</p>
+                <h2>Indicadores para dealer sales</h2>
+              </div>
+            </div>
+            <div id="kpiPlaybook" class="playbook-grid"></div>
+          </article>
+
+          <article class="panel-card">
+            <div class="card-header compact">
+              <div>
+                <p class="card-kicker">Riesgos externos</p>
+                <h2>Radar de industria en Puerto Rico</h2>
+              </div>
+            </div>
+            <div class="risk-summary" id="riskSummary"></div>
+            <div id="industryFeed" class="feed-grid"></div>
+          </article>
+        </section>
+
+        <section class="advisor-grid">
+          <article class="panel-card">
+            <div class="card-header compact">
+              <div>
+                <p class="card-kicker">Target Market</p>
+                <h2>Asistente de mercadeo por producto</h2>
+              </div>
+            </div>
+            <div id="productAdvisor" class="advisor-list"></div>
+          </article>
+
+          <article class="panel-card">
+            <div class="card-header compact">
+              <div>
+                <p class="card-kicker">Milestones</p>
+                <h2>Coach para cumplir metas</h2>
+              </div>
+            </div>
+            <div id="milestoneCoach" class="advisor-list"></div>
+          </article>
+        </section>
+
+        <section class="governance-grid">
+          <article class="panel-card">
+            <div class="card-header compact">
+              <div>
+                <p class="card-kicker">Roles</p>
+                <h2>Control de acceso</h2>
+              </div>
+            </div>
+            <div id="userAccessList" class="records-list"></div>
+          </article>
+
+          <article class="panel-card">
+            <div class="card-header compact">
+              <div>
+                <p class="card-kicker">Auditoría</p>
+                <h2>Historial de cambios</h2>
+              </div>
+            </div>
+            <div id="auditLogList" class="records-list"></div>
+          </article>
+        </section>
+
+        <section class="records-grid">
+          <article class="panel-card">
+            <div class="card-header compact">
+              <div>
+                <p class="card-kicker">Registros</p>
+                <h2>Ventas ingresadas</h2>
+              </div>
+            </div>
+            <div id="salesList" class="records-list"></div>
+          </article>
+
+          <article class="panel-card">
+            <div class="card-header compact">
+              <div>
+                <p class="card-kicker">Red comercial</p>
+                <h2>Puntos activos</h2>
+              </div>
+              <button id="resetAllButton" class="secondary-button">
+                Reiniciar dashboard
+              </button>
+            </div>
+            <div id="networkList" class="records-list"></div>
+          </article>
+        </section>
+      </main>
+    </div>
+
+    <script src="data/puerto-rico-municipios.js"></script>
+    <script src="data/florida-counties.js"></script>
+    <script src="data/sales-data.js"></script>
+    <script src="data/network-data.js"></script>
+    <script src="data/industry-feed.js"></script>
+    <script src="config.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>
