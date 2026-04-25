@@ -62,17 +62,18 @@ input {
   min-height: calc(100vh - 56px);
   display: grid;
   place-items: center;
-  padding: 20px 0;
+  padding: 28px 0;
 }
 
 .login-gate-card {
   position: relative;
   overflow: hidden;
-  width: min(100%, 760px);
-  padding: 48px 32px 36px;
+  width: min(100%, 620px);
+  padding: 52px 32px 36px;
   border-radius: 32px;
   background:
-    radial-gradient(circle at top, rgba(255, 213, 74, 0.14), transparent 32%),
+    radial-gradient(circle at top, rgba(255, 213, 74, 0.13), transparent 30%),
+    radial-gradient(circle at bottom left, rgba(45, 103, 167, 0.12), transparent 32%),
     linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02)),
     var(--surface);
   border: 1px solid var(--border);
@@ -80,38 +81,70 @@ input {
   text-align: center;
 }
 
-.login-gate-panel {
-  display: grid;
-  gap: 16px;
-  width: min(100%, 380px);
-  margin: 0 auto;
-  padding: 24px;
+.login-gate-card::after {
+  content: "";
+  position: absolute;
+  inset: 18px;
   border-radius: 24px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  pointer-events: none;
 }
 
-.login-gate-panel-centered h2 {
+.login-gate-copy {
+  display: grid;
+  gap: 10px;
+  width: min(100%, 460px);
+  margin: 0 auto 22px;
+}
+
+.login-gate-kicker {
   margin: 0;
-  font-size: clamp(1.65rem, 3vw, 2.35rem);
-  line-height: 1.02;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+.login-gate-copy h2 {
+  margin: 0;
+  font-size: clamp(2rem, 4vw, 3.3rem);
+  line-height: 0.96;
+}
+
+.login-gate-intro {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.login-gate-panel {
+  display: grid;
+  gap: 14px;
+  width: min(100%, 380px);
+  margin: 0 auto;
+  padding: 22px 20px 18px;
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
 }
 
 .login-brand-wrap {
   display: grid;
   place-items: center;
-  margin-bottom: 22px;
+  margin-bottom: 14px;
 }
 
 .login-brand-image {
-  width: min(100%, 360px);
+  width: min(100%, 320px);
   height: auto;
   display: block;
-  filter: drop-shadow(0 18px 30px rgba(0, 0, 0, 0.28));
+  filter: drop-shadow(0 22px 34px rgba(0, 0, 0, 0.3));
 }
 
 .login-brand-wrap-standalone {
-  min-height: 220px;
+  min-height: auto;
 }
 
 .login-gate-field {
@@ -451,13 +484,15 @@ h2 {
 select,
 input[type="number"],
 input[type="text"],
+input[type="email"],
 input[type="file"] {
   width: 100%;
 }
 
 select,
 input[type="number"],
-input[type="text"] {
+input[type="text"],
+input[type="email"] {
   padding: 12px 14px;
   border-radius: 14px;
   border: 1px solid rgba(255, 255, 255, 0.08);
@@ -926,6 +961,15 @@ option {
 @media (max-width: 620px) {
   .page-shell {
     padding: 18px 12px 36px;
+  }
+
+  .login-gate-card {
+    padding: 38px 18px 24px;
+    border-radius: 26px;
+  }
+
+  .login-gate-copy h2 {
+    font-size: 2.35rem;
   }
 
   .split-fields,
