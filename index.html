@@ -8,7 +8,7 @@
   </head>
   <body>
     <div class="page-shell">
-      <header class="hero">
+      <header class="hero" id="heroSection">
         <div class="hero-copy-block" id="heroMarketingBlock">
           <p class="eyebrow">Solaris Power Dealer Intelligence</p>
           <h1>Puerto Rico, ventas, expansión y riesgos en una sola vista.</h1>
@@ -105,84 +105,28 @@
 
       <section id="loginGate" class="login-gate hidden">
         <div class="login-gate-card">
-          <div class="login-orb orb-a"></div>
-          <div class="login-orb orb-b"></div>
-          <div class="login-gridlines"></div>
-          <div class="login-gate-grid">
-            <div class="login-gate-copy">
-              <p class="eyebrow">Solaris Power Executive Access</p>
-              <h2>Inicia sesión para entrar al centro de inteligencia comercial.</h2>
-              <p class="hero-copy">
-                Este entorno contiene ventas, expansión territorial, metas KPI,
-                roles, auditoría y decisiones estratégicas. El contenido solo se
-                muestra a usuarios autenticados.
-              </p>
-              <div class="login-gate-highlight">
-                <span class="login-highlight-line"></span>
-                <div>
-                  <strong>Portal Ejecutivo Solaris Power</strong>
-                  <p>
-                    Diseñado para liderazgo, expansión disciplinada y toma de
-                    decisiones con visibilidad territorial en tiempo real.
-                  </p>
-                </div>
-              </div>
-              <div class="login-gate-quote">
-                <strong>Una empresa familiar con visión ejecutiva.</strong>
-                <p>
-                  Diseñado para liderazgo comercial, seguimiento territorial y
-                  decisiones de crecimiento en Puerto Rico y Florida.
-                </p>
-              </div>
-              <div class="login-gate-badges">
-                <span class="status-pill">Dashboard compartido</span>
-                <span class="status-pill">Roles por usuario</span>
-                <span class="status-pill">Historial auditado</span>
-                <span class="status-pill">Datos centralizados</span>
-              </div>
+          <div class="login-brand-wrap login-brand-wrap-standalone">
+            <img
+              class="login-brand-image"
+              src="assets/solaris-power-branding.png"
+              alt="Solaris Power"
+            />
+          </div>
+          <div class="login-gate-panel login-gate-panel-centered">
+            <p class="eyebrow">Acceso Ejecutivo</p>
+            <h2>Inicia sesión para entrar al dashboard compartido.</h2>
+            <div class="field-group login-gate-field">
+              <label for="loginGateEmailInput">Email de acceso</label>
+              <input
+                id="loginGateEmailInput"
+                type="email"
+                placeholder="ejecutivo@solarispower.com"
+              />
             </div>
-            <div class="login-gate-panel">
-              <div class="login-brand-wrap">
-                <img
-                  class="login-brand-image"
-                  src="assets/solaris-power-branding.png"
-                  alt="Solaris Power"
-                />
-              </div>
-              <div class="login-gate-note">
-                <strong>Acceso protegido</strong>
-                <p>
-                  Usa tu correo corporativo para recibir el magic link. Una vez
-                  adentro podrás ver el dashboard según el rol asignado por el
-                  administrador.
-                </p>
-              </div>
-              <div class="login-panel-stat">
-                <div>
-                  <small>Entorno</small>
-                  <strong>Executive Portal</strong>
-                </div>
-                <div>
-                  <small>Seguridad</small>
-                  <strong>Magic Link + Roles</strong>
-                </div>
-              </div>
-              <div class="login-panel-stat">
-                <div>
-                  <small>Mercados</small>
-                  <strong>Puerto Rico + Florida</strong>
-                </div>
-                <div>
-                  <small>Enfoque</small>
-                  <strong>KPI, riesgo y expansión</strong>
-                </div>
-              </div>
-              <div class="login-gate-checklist">
-                <div class="login-check">Ventas y puntos físicos</div>
-                <div class="login-check">Metas y milestones</div>
-                <div class="login-check">Riesgos y auditoría</div>
-              </div>
-            </div>
+            <button id="loginGateSendButton">Enviar acceso</button>
+            <small id="loginGateMessage" class="field-help">
+              Usa tu correo corporativo para recibir el magic link.
+            </small>
           </div>
         </div>
       </section>
