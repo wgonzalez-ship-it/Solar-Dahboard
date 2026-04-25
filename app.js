@@ -145,6 +145,9 @@
   let accessProfiles = [];
   let auditEntries = [];
   let cloudEnabled = Boolean(APP_CONFIG.enableCloud && APP_CONFIG.supabaseUrl && APP_CONFIG.supabaseAnonKey);
+  let realtimeChannel = null;
+  let realtimeRefreshTimer = null;
+  let realtimeRefreshPromise = null;
 
   const svg = document.getElementById("mapSvg");
   const heroMarketingBlock = document.getElementById("heroMarketingBlock");
@@ -343,6 +346,13 @@
     authMessage.textContent = message;
   }
 
+  function normalizeEmailValue(value) {
+    return String(value || "")
+      .trim()
+      .replace(/\s+/g, "")
+      .replace(/,/g, ".");
+  }
+
   function isContentLocked() {
     return isCloudActive() && !authSession;
   }
@@ -361,6 +371,80 @@
     riskAssessments = Object.fromEntries(industrySignals.map((signal) => [signal.id, "2"]));
     selectedMunicipality = null;
     syncTargetInputs();
+  }
+
+  function teardownRealtimeSync() {
+    if (realtimeRefreshTimer) {
+      window.clearTimeout(realtimeRefreshTimer);
+      realtimeRefreshTimer = null;
+    }
+    if (supabase && realtimeChannel) {
+      supabase.removeChannel(realtimeChannel);
+    }
+    realtimeChannel = null;
+    realtimeRefreshPromise = null;
+  }
+
+  function queueRealtimeRefresh() {
+    if (!supabase || !authSession) {
+      return;
+    }
+
+    if (realtimeRefreshTimer) {
+      window.clearTimeout(realtimeRefreshTimer);
+    }
+
+    realtimeRefreshTimer = window.setTimeout(async () => {
+      realtimeRefreshTimer = null;
+
+      if (realtimeRefreshPromise) {
+        return;
+      }
+
+      realtimeRefreshPromise = (async () => {
+        await loadCloudData();
+      })();
+
+      try {
+        await realtimeRefreshPromise;
+      } finally {
+        realtimeRefreshPromise = null;
+      }
+    }, 180);
+  }
+
+  function setupRealtimeSync() {
+    teardownRealtimeSync();
+
+    if (!supabase || !authSession) {
+      return;
+    }
+
+    const realtimeTables = [
+      "profiles",
+      "sales_records",
+      "network_locations",
+      "kpi_targets",
+      "risk_assessments",
+      "audit_log",
+    ];
+
+    realtimeChannel = realtimeTables.reduce((channel, table) => {
+      return channel.on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table,
+          filter: `workspace_slug=eq.${WORKSPACE_SLUG}`,
+        },
+        () => {
+          queueRealtimeRefresh();
+        },
+      );
+    }, supabase.channel(`workspace-sync-${WORKSPACE_SLUG}`));
+
+    realtimeChannel.subscribe();
   }
 
   function applyPermissions() {
@@ -453,11 +537,14 @@
     if (authUser) {
       await ensureProfile();
       await loadCloudData();
+      setupRealtimeSync();
     } else {
+      teardownRealtimeSync();
       clearSharedState();
     }
 
     supabase.auth.onAuthStateChange(async (_event, session) => {
+      teardownRealtimeSync();
       authSession = session;
       authUser = session?.user || null;
       authProfile = null;
@@ -467,6 +554,7 @@
       if (authUser) {
         await ensureProfile();
         await loadCloudData();
+        setupRealtimeSync();
       } else {
         clearSharedState();
         renderAuthState();
@@ -516,7 +604,20 @@
       return;
     }
 
-    const [salesRes, locationsRes, targetsRes, risksRes, auditRes, accessRes] = await Promise.all([
+    const [
+      profileRes,
+      salesRes,
+      locationsRes,
+      targetsRes,
+      risksRes,
+      auditRes,
+      accessRes,
+    ] = await Promise.all([
+      supabase
+        .from("profiles")
+        .select("*")
+        .eq("user_id", authUser.id)
+        .maybeSingle(),
       supabase
         .from("sales_records")
         .select("*")
@@ -542,15 +643,14 @@
         .eq("workspace_slug", WORKSPACE_SLUG)
         .order("changed_at", { ascending: false })
         .limit(20),
-      canManageUsers()
-        ? supabase
-            .from("profiles")
-            .select("*")
-            .eq("workspace_slug", WORKSPACE_SLUG)
-            .order("email", { ascending: true })
-        : Promise.resolve({ data: [] }),
+      supabase
+        .from("profiles")
+        .select("*")
+        .eq("workspace_slug", WORKSPACE_SLUG)
+        .order("email", { ascending: true }),
     ]);
 
+    authProfile = profileRes.data || authProfile;
     salesRecords = (salesRes.data || []).map((record) => ({
       ...record,
       municipality: record.municipality,
@@ -585,13 +685,17 @@
   }
 
   async function sendMagicLink() {
-    if (!supabase || !authEmailInput.value.trim()) {
+    const normalizedEmail = normalizeEmailValue(authEmailInput.value);
+
+    authEmailInput.value = normalizedEmail;
+
+    if (!supabase || !normalizedEmail) {
       setAuthMessage("Escribe un email válido para enviar el acceso.");
       return;
     }
 
     const { error } = await supabase.auth.signInWithOtp({
-      email: authEmailInput.value.trim(),
+      email: normalizedEmail,
       options: {
         emailRedirectTo: window.location.href,
       },
@@ -608,6 +712,7 @@
     if (!supabase) {
       return;
     }
+    teardownRealtimeSync();
     await supabase.auth.signOut();
     setAuthMessage("Sesión cerrada.");
   }
@@ -1907,6 +2012,9 @@
   saveTargetsButton.addEventListener("click", saveTargets);
   resetAllButton.addEventListener("click", resetDashboard);
   sendMagicLinkButton.addEventListener("click", sendMagicLink);
+  authEmailInput.addEventListener("blur", () => {
+    authEmailInput.value = normalizeEmailValue(authEmailInput.value);
+  });
   signOutButton.addEventListener("click", signOut);
   syncNowButton.addEventListener("click", async () => {
     if (isCloudActive() && authSession) {
