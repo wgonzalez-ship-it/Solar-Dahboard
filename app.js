@@ -150,6 +150,7 @@
   let realtimeRefreshPromise = null;
 
   const svg = document.getElementById("mapSvg");
+  const heroSection = document.getElementById("heroSection");
   const heroMarketingBlock = document.getElementById("heroMarketingBlock");
   const loginGate = document.getElementById("loginGate");
   const dashboardMain = document.getElementById("dashboardMain");
@@ -183,6 +184,9 @@
   const authSignedIn = document.getElementById("authSignedIn");
   const authEmailInput = document.getElementById("authEmailInput");
   const sendMagicLinkButton = document.getElementById("sendMagicLinkButton");
+  const loginGateEmailInput = document.getElementById("loginGateEmailInput");
+  const loginGateSendButton = document.getElementById("loginGateSendButton");
+  const loginGateMessage = document.getElementById("loginGateMessage");
   const authUserEmail = document.getElementById("authUserEmail");
   const authUserRole = document.getElementById("authUserRole");
   const syncNowButton = document.getElementById("syncNowButton");
@@ -344,6 +348,23 @@
 
   function setAuthMessage(message) {
     authMessage.textContent = message;
+    if (loginGateMessage) {
+      loginGateMessage.textContent = message;
+    }
+  }
+
+  function syncAuthInputs(value) {
+    authEmailInput.value = value;
+    if (loginGateEmailInput) {
+      loginGateEmailInput.value = value;
+    }
+  }
+
+  function getAuthEmailValue() {
+    if (isContentLocked() && loginGateEmailInput) {
+      return loginGateEmailInput.value;
+    }
+    return authEmailInput.value;
   }
 
   function normalizeEmailValue(value) {
@@ -359,6 +380,7 @@
 
   function applyContentGate() {
     const locked = isContentLocked();
+    heroSection.classList.toggle("hidden", locked);
     heroMarketingBlock.classList.toggle("hidden", locked);
     loginGate.classList.toggle("hidden", !locked);
     dashboardMain.classList.toggle("hidden", locked);
@@ -495,6 +517,12 @@
       authSignedIn.classList.add("hidden");
       authEmailInput.disabled = true;
       sendMagicLinkButton.disabled = true;
+      if (loginGateEmailInput) {
+        loginGateEmailInput.disabled = true;
+      }
+      if (loginGateSendButton) {
+        loginGateSendButton.disabled = true;
+      }
       setAuthMessage("Agrega `config.js` con credenciales de Supabase para habilitar login compartido.");
       authUserEmail.textContent = "-";
       authUserRole.textContent = "local-admin";
@@ -506,10 +534,21 @@
     authStatusText.textContent = authSession
       ? "La app está conectada a la base de datos central y sincronizando información compartida."
       : "Inicia sesión con magic link para trabajar sobre el dashboard compartido.";
+    setAuthMessage(
+      authSession
+        ? "Los cambios se guardan en la base central y se reflejan en las demás sesiones conectadas."
+        : "Usa tu email y el magic link para entrar al dashboard compartido."
+    );
     authSignedOut.classList.toggle("hidden", Boolean(authSession));
     authSignedIn.classList.toggle("hidden", !authSession);
     authEmailInput.disabled = false;
     sendMagicLinkButton.disabled = false;
+    if (loginGateEmailInput) {
+      loginGateEmailInput.disabled = false;
+    }
+    if (loginGateSendButton) {
+      loginGateSendButton.disabled = false;
+    }
     authUserEmail.textContent = authUser?.email || "-";
     authUserRole.textContent = roleName();
     applyContentGate();
@@ -685,9 +724,9 @@
   }
 
   async function sendMagicLink() {
-    const normalizedEmail = normalizeEmailValue(authEmailInput.value);
+    const normalizedEmail = normalizeEmailValue(getAuthEmailValue());
 
-    authEmailInput.value = normalizedEmail;
+    syncAuthInputs(normalizedEmail);
 
     if (!supabase || !normalizedEmail) {
       setAuthMessage("Escribe un email válido para enviar el acceso.");
@@ -2012,9 +2051,17 @@
   saveTargetsButton.addEventListener("click", saveTargets);
   resetAllButton.addEventListener("click", resetDashboard);
   sendMagicLinkButton.addEventListener("click", sendMagicLink);
+  if (loginGateSendButton) {
+    loginGateSendButton.addEventListener("click", sendMagicLink);
+  }
   authEmailInput.addEventListener("blur", () => {
-    authEmailInput.value = normalizeEmailValue(authEmailInput.value);
+    syncAuthInputs(normalizeEmailValue(authEmailInput.value));
   });
+  if (loginGateEmailInput) {
+    loginGateEmailInput.addEventListener("blur", () => {
+      syncAuthInputs(normalizeEmailValue(loginGateEmailInput.value));
+    });
+  }
   signOutButton.addEventListener("click", signOut);
   syncNowButton.addEventListener("click", async () => {
     if (isCloudActive() && authSession) {
