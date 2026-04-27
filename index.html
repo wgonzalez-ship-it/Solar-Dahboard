@@ -182,322 +182,376 @@
 
         <section class="kpi-grid" id="kpiGrid"></section>
 
-        <section class="workspace">
-          <article class="map-card">
-            <div class="card-header">
-              <div>
-                <p class="card-kicker">Mapa interactivo</p>
-                <h2>Tablero territorial de Puerto Rico</h2>
-              </div>
-              <div class="legend-block">
-                <span>Leyenda de intensidad</span>
-                <div class="legend-scale" id="legendScale"></div>
-              </div>
+        <section class="dashboard-band">
+          <div class="band-header">
+            <div>
+              <p class="card-kicker">Territorio y captura</p>
+              <h2>Mapa, detalle operativo y entrada comercial</h2>
             </div>
-            <div class="map-frame">
-              <svg
-                id="mapSvg"
-                viewBox="0 0 1000 650"
-                aria-label="Mapa de Puerto Rico por municipios"
-              ></svg>
-              <div class="tooltip" id="mapTooltip" hidden></div>
-            </div>
-            <div class="map-footer">
-              <span>
-                El color muestra la métrica seleccionada. Los íconos muestran
-                oficinas, kioskos y showrooms.
-              </span>
-            </div>
-          </article>
+            <p class="band-copy">
+              Todo lo esencial para leer el territorio y registrar ventas,
+              puntos físicos y metas sin abrumar a los ejecutivos.
+            </p>
+          </div>
 
-          <aside class="side-panel">
-            <article class="detail-card">
-              <div class="card-header compact">
+          <section class="workspace">
+            <article class="map-card">
+              <div class="card-header">
                 <div>
-                  <p class="card-kicker">Detalle municipal</p>
-                  <h2 id="detailTitle">Selecciona un territorio</h2>
+                  <p class="card-kicker">Mapa interactivo</p>
+                  <h2>Tablero territorial de Puerto Rico</h2>
+                </div>
+                <div class="legend-block">
+                  <span>Leyenda de intensidad</span>
+                  <div class="legend-scale" id="legendScale"></div>
                 </div>
               </div>
-              <div id="detailContent" class="detail-content">
-                <p>
-                  Haz clic sobre un territorio para ver KPI, estructura comercial
-                  y oportunidad de desarrollo.
-                </p>
+              <div class="map-frame">
+                <svg
+                  id="mapSvg"
+                  viewBox="0 0 1000 650"
+                  aria-label="Mapa de Puerto Rico por municipios"
+                ></svg>
+                <div class="tooltip" id="mapTooltip" hidden></div>
+              </div>
+              <div class="map-footer">
+                <span>
+                  El color muestra la métrica seleccionada. Los íconos muestran
+                  oficinas, kioskos y showrooms.
+                </span>
               </div>
             </article>
 
-            <article class="detail-card">
+            <aside class="side-panel tab-group" data-tab-group>
+              <div class="panel-tabs">
+                <button class="active" data-target="territory">Detalle</button>
+                <button data-target="sales">Ventas</button>
+                <button data-target="expansion">Expansión</button>
+                <button data-target="targets">Metas</button>
+              </div>
+
+              <div class="tab-panels">
+                <article class="detail-card tab-panel" data-panel="territory">
+                  <div class="card-header compact">
+                    <div>
+                      <p class="card-kicker">Detalle municipal</p>
+                      <h2 id="detailTitle">Selecciona un territorio</h2>
+                    </div>
+                  </div>
+                  <div id="detailContent" class="detail-content">
+                    <p>
+                      Haz clic sobre un territorio para ver KPI, estructura comercial
+                      y oportunidad de desarrollo.
+                    </p>
+                  </div>
+                </article>
+
+                <article class="detail-card tab-panel hidden" data-panel="sales">
+                  <div class="card-header compact">
+                    <div>
+                      <p class="card-kicker">Entrada de ventas</p>
+                      <h2>Añadir registro comercial</h2>
+                    </div>
+                  </div>
+                  <div class="data-form">
+                    <div class="advisor-note">
+                      <strong>Cómo usar esta sección</strong>
+                      <div>
+                        Registra una venta indicando dónde ocurrió, qué producto se
+                        vendió, en qué mes y cuál fue su impacto en unidades e ingresos.
+                      </div>
+                    </div>
+                    <div class="field-group">
+                      <label for="salesMunicipalitySelect">Territorio</label>
+                      <select id="salesMunicipalitySelect"></select>
+                      <small class="field-help">Municipio o condado donde ocurrió la venta o donde se cerró el negocio.</small>
+                    </div>
+                    <div class="field-group">
+                      <label for="salesProductSelect">Producto</label>
+                      <select id="salesProductSelect">
+                        <option value="Ritello">Vacuum Ritello</option>
+                        <option value="Placas Solares">Sistemas de Placas Solares</option>
+                        <option value="Sistemas de Agua">Sistemas de Agua</option>
+                        <option value="Baterias">Baterías</option>
+                      </select>
+                      <small class="field-help">Selecciona cuál de los productos fue vendido.</small>
+                    </div>
+                    <div class="split-fields">
+                      <div class="field-group">
+                        <label for="salesYearSelect">Año</label>
+                        <select id="salesYearSelect">
+                          <option value="2026">2026</option>
+                          <option value="2027">2027</option>
+                        </select>
+                        <small class="field-help">Año al que pertenece esa venta dentro del dashboard.</small>
+                      </div>
+                      <div class="field-group">
+                        <label for="salesMonthSelect">Mes</label>
+                        <select id="salesMonthSelect"></select>
+                        <small class="field-help">Mes en el que esa venta debe contarse dentro del periodo.</small>
+                      </div>
+                    </div>
+                    <div class="split-fields">
+                      <div class="field-group">
+                        <label for="salesUnitsInput">Unidades</label>
+                        <input id="salesUnitsInput" type="number" min="0" value="0" placeholder="Ej. 3" />
+                        <small class="field-help">Cantidad de unidades vendidas en ese registro.</small>
+                      </div>
+                    </div>
+                    <div class="field-group">
+                      <label for="salesRevenueInput">Ingresos</label>
+                      <input id="salesRevenueInput" type="number" min="0" value="0" placeholder="Ej. 45000" />
+                      <small class="field-help">Monto total de dinero generado por esa venta.</small>
+                    </div>
+                    <button id="addSalesButton">Guardar registro</button>
+                    <p class="microcopy">
+                      El dashboard comienza en cero para que ustedes hagan el data
+                      entry desde el primer día.
+                    </p>
+                  </div>
+                </article>
+
+                <article class="detail-card tab-panel hidden" data-panel="expansion">
+                  <div class="card-header compact">
+                    <div>
+                      <p class="card-kicker">Expansión comercial</p>
+                      <h2>Añadir oficina, kiosko o showroom</h2>
+                    </div>
+                  </div>
+                  <div class="data-form">
+                    <div class="advisor-note">
+                      <strong>Cómo usar esta sección</strong>
+                      <div>
+                        Registra un nuevo punto físico y la capacidad humana que
+                        tendrá en ese municipio.
+                      </div>
+                    </div>
+                    <div class="field-group">
+                      <label for="locationNameInput">Nombre del punto</label>
+                      <input id="locationNameInput" type="text" placeholder="Ej. Showroom Plaza Carolina" />
+                      <small class="field-help">Nombre interno o comercial del punto que vas a abrir.</small>
+                    </div>
+                    <div class="field-group">
+                      <label for="locationTypeSelect">Tipo de punto</label>
+                      <select id="locationTypeSelect">
+                        <option value="Oficina">Oficina</option>
+                        <option value="Kiosko">Kiosko</option>
+                        <option value="Showroom">Showroom</option>
+                      </select>
+                      <small class="field-help">Selecciona si el punto será oficina, kiosko o showroom.</small>
+                    </div>
+                    <div class="field-group">
+                      <label for="locationMunicipalitySelect">Territorio</label>
+                      <select id="locationMunicipalitySelect"></select>
+                      <small class="field-help">Municipio o condado donde operará ese punto físico.</small>
+                    </div>
+                    <div class="split-fields">
+                      <div class="field-group">
+                        <label for="leadersInput">Líderes</label>
+                        <input id="leadersInput" type="number" min="0" value="0" placeholder="Ej. 2" />
+                        <small class="field-help">Cantidad de supervisores o líderes que manejarán ese punto.</small>
+                      </div>
+                      <div class="field-group">
+                        <label for="sellersInput">Vendedores</label>
+                        <input id="sellersInput" type="number" min="0" value="0" placeholder="Ej. 8" />
+                        <small class="field-help">Cantidad de vendedores activos asignados a ese punto.</small>
+                      </div>
+                    </div>
+                    <button id="addLocationButton">Añadir al mapa</button>
+                  </div>
+                </article>
+
+                <article class="detail-card tab-panel hidden" data-panel="targets">
+                  <div class="card-header compact">
+                    <div>
+                      <p class="card-kicker">Objetivos</p>
+                      <h2>Configurar metas KPI</h2>
+                    </div>
+                  </div>
+                  <div class="data-form">
+                    <div class="advisor-note">
+                      <strong>Cómo usar esta sección</strong>
+                      <div>
+                        Define aquí las metas del periodo para que el dashboard mida
+                        progreso, brechas y próximos pasos recomendados.
+                      </div>
+                    </div>
+                    <div class="split-fields">
+                      <div class="field-group">
+                        <label for="targetRevenueInput">Meta de ingresos</label>
+                        <input id="targetRevenueInput" type="number" min="0" value="0" placeholder="Ej. 500000" />
+                        <small class="field-help">Total en ventas que quieren alcanzar en el periodo.</small>
+                      </div>
+                      <div class="field-group">
+                        <label for="targetUnitsInput">Meta de unidades</label>
+                        <input id="targetUnitsInput" type="number" min="0" value="0" placeholder="Ej. 120" />
+                        <small class="field-help">Cantidad total de productos vendidos que quieren lograr.</small>
+                      </div>
+                    </div>
+                    <div class="split-fields">
+                      <div class="field-group">
+                        <label for="targetLocationsInput">Meta de puntos físicos</label>
+                        <input id="targetLocationsInput" type="number" min="0" value="0" placeholder="Ej. 8" />
+                        <small class="field-help">Número de oficinas, kioskos o showrooms que quieren tener.</small>
+                      </div>
+                      <div class="field-group">
+                        <label for="targetSellersInput">Meta de vendedores</label>
+                        <input id="targetSellersInput" type="number" min="0" value="0" placeholder="Ej. 40" />
+                        <small class="field-help">Cantidad de vendedores activos que necesita la operación.</small>
+                      </div>
+                    </div>
+                    <button id="saveTargetsButton">Guardar metas</button>
+                  </div>
+                </article>
+              </div>
+            </aside>
+          </section>
+        </section>
+
+        <section class="dashboard-band tab-group" data-tab-group>
+          <div class="band-header">
+            <div>
+              <p class="card-kicker">Análisis y decisiones</p>
+              <h2>Lecturas ejecutivas y foco comercial</h2>
+            </div>
+            <p class="band-copy">
+              Una sola capa para entender rendimiento, riesgo, enfoque territorial
+              y estrategia de producto sin saturar la vista.
+            </p>
+          </div>
+          <div class="panel-tabs">
+            <button class="active" data-target="trend">Tendencia</button>
+            <button data-target="priorities">Prioridades</button>
+            <button data-target="cockpit">KPI</button>
+            <button data-target="risk">Riesgos</button>
+            <button data-target="market">Target</button>
+            <button data-target="milestones">Milestones</button>
+          </div>
+          <div class="tab-panels analysis-deck">
+            <article class="panel-card tab-panel" data-panel="trend">
               <div class="card-header compact">
                 <div>
-                  <p class="card-kicker">Entrada de ventas</p>
-                  <h2>Añadir registro comercial</h2>
+                  <p class="card-kicker">Tendencia</p>
+                  <h2>Ingresos mensuales</h2>
                 </div>
               </div>
-              <div class="data-form">
-                <div class="advisor-note">
-                  <strong>Cómo usar esta sección</strong>
-                  <div>
-                    Registra una venta indicando dónde ocurrió, qué producto se
-                    vendió, en qué mes y cuál fue su impacto en unidades e ingresos.
-                  </div>
-                </div>
-                <div class="field-group">
-                  <label for="salesMunicipalitySelect">Territorio</label>
-                  <select id="salesMunicipalitySelect"></select>
-                  <small class="field-help">Municipio o condado donde ocurrió la venta o donde se cerró el negocio.</small>
-                </div>
-                <div class="field-group">
-                  <label for="salesProductSelect">Producto</label>
-                  <select id="salesProductSelect">
-                    <option value="Ritello">Vacuum Ritello</option>
-                    <option value="Placas Solares">Sistemas de Placas Solares</option>
-                    <option value="Sistemas de Agua">Sistemas de Agua</option>
-                    <option value="Baterias">Baterías</option>
-                  </select>
-                  <small class="field-help">Selecciona cuál de los productos fue vendido.</small>
-                </div>
-                <div class="split-fields">
-                  <div class="field-group">
-                    <label for="salesYearSelect">Año</label>
-                    <select id="salesYearSelect">
-                      <option value="2026">2026</option>
-                      <option value="2027">2027</option>
-                    </select>
-                    <small class="field-help">Año al que pertenece esa venta dentro del dashboard.</small>
-                  </div>
-                  <div class="field-group">
-                    <label for="salesMonthSelect">Mes</label>
-                    <select id="salesMonthSelect"></select>
-                    <small class="field-help">Mes en el que esa venta debe contarse dentro del periodo.</small>
-                  </div>
-                </div>
-                <div class="split-fields">
-                  <div class="field-group">
-                    <label for="salesUnitsInput">Unidades</label>
-                    <input id="salesUnitsInput" type="number" min="0" value="0" placeholder="Ej. 3" />
-                    <small class="field-help">Cantidad de unidades vendidas en ese registro.</small>
-                  </div>
-                </div>
-                <div class="field-group">
-                  <label for="salesRevenueInput">Ingresos</label>
-                  <input id="salesRevenueInput" type="number" min="0" value="0" placeholder="Ej. 45000" />
-                  <small class="field-help">Monto total de dinero generado por esa venta.</small>
-                </div>
-                <button id="addSalesButton">Guardar registro</button>
-                <p class="microcopy">
-                  El dashboard comienza en cero para que ustedes hagan el data
-                  entry desde el primer día.
-                </p>
-              </div>
+              <div id="trendChart" class="trend-chart"></div>
             </article>
 
-            <article class="detail-card">
+            <article class="panel-card tab-panel hidden" data-panel="priorities">
               <div class="card-header compact">
                 <div>
-                  <p class="card-kicker">Expansión comercial</p>
-                  <h2>Añadir oficina, kiosko o showroom</h2>
+                  <p class="card-kicker">Decisiones</p>
+                  <h2>Municipios a priorizar</h2>
                 </div>
               </div>
-              <div class="data-form">
-                <div class="advisor-note">
-                  <strong>Cómo usar esta sección</strong>
-                  <div>
-                    Registra un nuevo punto físico y la capacidad humana que
-                    tendrá en ese municipio.
-                  </div>
-                </div>
-                <div class="field-group">
-                  <label for="locationNameInput">Nombre del punto</label>
-                  <input id="locationNameInput" type="text" placeholder="Ej. Showroom Plaza Carolina" />
-                  <small class="field-help">Nombre interno o comercial del punto que vas a abrir.</small>
-                </div>
-                  <div class="field-group">
-                    <label for="locationTypeSelect">Tipo de punto</label>
-                  <select id="locationTypeSelect">
-                    <option value="Oficina">Oficina</option>
-                    <option value="Kiosko">Kiosko</option>
-                    <option value="Showroom">Showroom</option>
-                  </select>
-                  <small class="field-help">Selecciona si el punto será oficina, kiosko o showroom.</small>
-                </div>
-                <div class="field-group">
-                  <label for="locationMunicipalitySelect">Territorio</label>
-                  <select id="locationMunicipalitySelect"></select>
-                  <small class="field-help">Municipio o condado donde operará ese punto físico.</small>
-                </div>
-                <div class="split-fields">
-                  <div class="field-group">
-                    <label for="leadersInput">Líderes</label>
-                    <input id="leadersInput" type="number" min="0" value="0" placeholder="Ej. 2" />
-                    <small class="field-help">Cantidad de supervisores o líderes que manejarán ese punto.</small>
-                  </div>
-                  <div class="field-group">
-                    <label for="sellersInput">Vendedores</label>
-                    <input id="sellersInput" type="number" min="0" value="0" placeholder="Ej. 8" />
-                    <small class="field-help">Cantidad de vendedores activos asignados a ese punto.</small>
-                  </div>
-                </div>
-                <button id="addLocationButton">Añadir al mapa</button>
-              </div>
+              <div id="opportunityTable" class="opportunity-table"></div>
             </article>
 
-            <article class="detail-card">
+            <article class="panel-card tab-panel hidden" data-panel="cockpit">
               <div class="card-header compact">
                 <div>
-                  <p class="card-kicker">Objetivos</p>
-                  <h2>Configurar metas KPI</h2>
+                  <p class="card-kicker">Cockpit KPI</p>
+                  <h2>Indicadores para dealer sales</h2>
                 </div>
               </div>
-              <div class="data-form">
-                <div class="advisor-note">
-                  <strong>Cómo usar esta sección</strong>
-                  <div>
-                    Define aquí las metas del periodo para que el dashboard mida
-                    progreso, brechas y próximos pasos recomendados.
-                  </div>
-                </div>
-                <div class="split-fields">
-                  <div class="field-group">
-                    <label for="targetRevenueInput">Meta de ingresos</label>
-                    <input id="targetRevenueInput" type="number" min="0" value="0" placeholder="Ej. 500000" />
-                    <small class="field-help">Total en ventas que quieren alcanzar en el periodo.</small>
-                  </div>
-                  <div class="field-group">
-                    <label for="targetUnitsInput">Meta de unidades</label>
-                    <input id="targetUnitsInput" type="number" min="0" value="0" placeholder="Ej. 120" />
-                    <small class="field-help">Cantidad total de productos vendidos que quieren lograr.</small>
-                  </div>
-                </div>
-                <div class="split-fields">
-                  <div class="field-group">
-                    <label for="targetLocationsInput">Meta de puntos físicos</label>
-                    <input id="targetLocationsInput" type="number" min="0" value="0" placeholder="Ej. 8" />
-                    <small class="field-help">Número de oficinas, kioskos o showrooms que quieren tener.</small>
-                  </div>
-                  <div class="field-group">
-                    <label for="targetSellersInput">Meta de vendedores</label>
-                    <input id="targetSellersInput" type="number" min="0" value="0" placeholder="Ej. 40" />
-                    <small class="field-help">Cantidad de vendedores activos que necesita la operación.</small>
-                  </div>
-                </div>
-                <button id="saveTargetsButton">Guardar metas</button>
-              </div>
+              <div id="kpiPlaybook" class="playbook-grid"></div>
             </article>
-          </aside>
+
+            <article class="panel-card tab-panel hidden" data-panel="risk">
+              <div class="card-header compact">
+                <div>
+                  <p class="card-kicker">Riesgos externos</p>
+                  <h2>Radar de industria en Puerto Rico</h2>
+                </div>
+              </div>
+              <div class="risk-summary" id="riskSummary"></div>
+              <div id="industryFeed" class="feed-grid"></div>
+            </article>
+
+            <article class="panel-card tab-panel hidden" data-panel="market">
+              <div class="card-header compact">
+                <div>
+                  <p class="card-kicker">Target Market</p>
+                  <h2>Asistente de mercadeo por producto</h2>
+                </div>
+              </div>
+              <div id="productAdvisor" class="advisor-list"></div>
+            </article>
+
+            <article class="panel-card tab-panel hidden" data-panel="milestones">
+              <div class="card-header compact">
+                <div>
+                  <p class="card-kicker">Milestones</p>
+                  <h2>Coach para cumplir metas</h2>
+                </div>
+              </div>
+              <div id="milestoneCoach" class="advisor-list"></div>
+            </article>
+          </div>
         </section>
 
-        <section class="bottom-grid">
-          <article class="panel-card">
-            <div class="card-header compact">
-              <div>
-                <p class="card-kicker">Tendencia</p>
-                <h2>Ingresos mensuales</h2>
-              </div>
+        <section class="dashboard-band tab-group" data-tab-group>
+          <div class="band-header">
+            <div>
+              <p class="card-kicker">Gobierno y registros</p>
+              <h2>Acceso, auditoría y base operativa</h2>
             </div>
-            <div id="trendChart" class="trend-chart"></div>
-          </article>
+            <p class="band-copy">
+              La capa administrativa queda agrupada aparte para que la operación
+              diaria se sienta limpia, pero sin perder control.
+            </p>
+          </div>
+          <div class="panel-tabs">
+            <button class="active" data-target="roles">Roles</button>
+            <button data-target="audit">Auditoría</button>
+            <button data-target="sales-records">Ventas</button>
+            <button data-target="network-records">Puntos</button>
+          </div>
+          <div class="tab-panels analysis-deck">
+            <article class="panel-card tab-panel" data-panel="roles">
+              <div class="card-header compact">
+                <div>
+                  <p class="card-kicker">Roles</p>
+                  <h2>Control de acceso</h2>
+                </div>
+              </div>
+              <div id="userAccessList" class="records-list"></div>
+            </article>
 
-          <article class="panel-card">
-            <div class="card-header compact">
-              <div>
-                <p class="card-kicker">Decisiones</p>
-                <h2>Municipios a priorizar</h2>
+            <article class="panel-card tab-panel hidden" data-panel="audit">
+              <div class="card-header compact">
+                <div>
+                  <p class="card-kicker">Auditoría</p>
+                  <h2>Historial de cambios</h2>
+                </div>
               </div>
-            </div>
-            <div id="opportunityTable" class="opportunity-table"></div>
-          </article>
-        </section>
+              <div id="auditLogList" class="records-list"></div>
+            </article>
 
-        <section class="intelligence-grid">
-          <article class="panel-card">
-            <div class="card-header compact">
-              <div>
-                <p class="card-kicker">Cockpit KPI</p>
-                <h2>Indicadores para dealer sales</h2>
+            <article class="panel-card tab-panel hidden" data-panel="sales-records">
+              <div class="card-header compact">
+                <div>
+                  <p class="card-kicker">Registros</p>
+                  <h2>Ventas ingresadas</h2>
+                </div>
               </div>
-            </div>
-            <div id="kpiPlaybook" class="playbook-grid"></div>
-          </article>
+              <div id="salesList" class="records-list"></div>
+            </article>
 
-          <article class="panel-card">
-            <div class="card-header compact">
-              <div>
-                <p class="card-kicker">Riesgos externos</p>
-                <h2>Radar de industria en Puerto Rico</h2>
+            <article class="panel-card tab-panel hidden" data-panel="network-records">
+              <div class="card-header compact">
+                <div>
+                  <p class="card-kicker">Red comercial</p>
+                  <h2>Puntos activos</h2>
+                </div>
+                <button id="resetAllButton" class="secondary-button">
+                  Reiniciar dashboard
+                </button>
               </div>
-            </div>
-            <div class="risk-summary" id="riskSummary"></div>
-            <div id="industryFeed" class="feed-grid"></div>
-          </article>
-        </section>
-
-        <section class="advisor-grid">
-          <article class="panel-card">
-            <div class="card-header compact">
-              <div>
-                <p class="card-kicker">Target Market</p>
-                <h2>Asistente de mercadeo por producto</h2>
-              </div>
-            </div>
-            <div id="productAdvisor" class="advisor-list"></div>
-          </article>
-
-          <article class="panel-card">
-            <div class="card-header compact">
-              <div>
-                <p class="card-kicker">Milestones</p>
-                <h2>Coach para cumplir metas</h2>
-              </div>
-            </div>
-            <div id="milestoneCoach" class="advisor-list"></div>
-          </article>
-        </section>
-
-        <section class="governance-grid">
-          <article class="panel-card">
-            <div class="card-header compact">
-              <div>
-                <p class="card-kicker">Roles</p>
-                <h2>Control de acceso</h2>
-              </div>
-            </div>
-            <div id="userAccessList" class="records-list"></div>
-          </article>
-
-          <article class="panel-card">
-            <div class="card-header compact">
-              <div>
-                <p class="card-kicker">Auditoría</p>
-                <h2>Historial de cambios</h2>
-              </div>
-            </div>
-            <div id="auditLogList" class="records-list"></div>
-          </article>
-        </section>
-
-        <section class="records-grid">
-          <article class="panel-card">
-            <div class="card-header compact">
-              <div>
-                <p class="card-kicker">Registros</p>
-                <h2>Ventas ingresadas</h2>
-              </div>
-            </div>
-            <div id="salesList" class="records-list"></div>
-          </article>
-
-          <article class="panel-card">
-            <div class="card-header compact">
-              <div>
-                <p class="card-kicker">Red comercial</p>
-                <h2>Puntos activos</h2>
-              </div>
-              <button id="resetAllButton" class="secondary-button">
-                Reiniciar dashboard
-              </button>
-            </div>
-            <div id="networkList" class="records-list"></div>
-          </article>
+              <div id="networkList" class="records-list"></div>
+            </article>
+          </div>
         </section>
       </main>
     </div>

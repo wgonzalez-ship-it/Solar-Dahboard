@@ -211,12 +211,14 @@
   const targetSellersInput = document.getElementById("targetSellersInput");
   const saveTargetsButton = document.getElementById("saveTargetsButton");
   const resetAllButton = document.getElementById("resetAllButton");
+  const tabGroups = Array.from(document.querySelectorAll("[data-tab-group]"));
 
   const municipalityShapes = new Map();
 
   populateSelectors();
   syncTargetInputs();
   syncSalesYearToPeriod();
+  initTabGroups();
 
   function loadStoredData(key, fallback) {
     try {
@@ -312,6 +314,38 @@
 
   function syncSalesYearToPeriod() {
     salesYearSelect.value = String(parsePeriodSelection().year);
+  }
+
+  function initTabGroups() {
+    tabGroups.forEach((group) => {
+      if (group.dataset.tabsBound === "true") {
+        return;
+      }
+      const buttons = Array.from(group.querySelectorAll(".panel-tabs button[data-target]"));
+      const panels = Array.from(group.querySelectorAll(".tab-panel[data-panel]"));
+      if (!buttons.length || !panels.length) {
+        return;
+      }
+
+      const activate = (target) => {
+        buttons.forEach((button) => {
+          button.classList.toggle("active", button.dataset.target === target);
+        });
+        panels.forEach((panel) => {
+          panel.classList.toggle("hidden", panel.dataset.panel !== target);
+        });
+      };
+
+      buttons.forEach((button) => {
+        button.addEventListener("click", () => activate(button.dataset.target));
+      });
+
+      const initialTarget =
+        buttons.find((button) => button.classList.contains("active"))?.dataset.target ||
+        buttons[0].dataset.target;
+      activate(initialTarget);
+      group.dataset.tabsBound = "true";
+    });
   }
 
   function isCloudActive() {
