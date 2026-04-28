@@ -80,6 +80,11 @@
     locations: 0,
     sellers: 0,
   };
+  const RISK_REFRESH_INTERVAL_MS = 15 * 60 * 1000;
+  const ADMIN_BOOTSTRAP_EMAILS = new Set([
+    "j.santiago@solarispowerpr.com",
+    "info@solarispowerpr.com",
+  ]);
   const APP_CONFIG = window.SOLARIS_APP_CONFIG || {};
   const WORKSPACE_SLUG = APP_CONFIG.workspaceSlug || "solaris-power";
   const SUPABASE_MODULE_URL =
@@ -148,6 +153,11 @@
   let realtimeChannel = null;
   let realtimeRefreshTimer = null;
   let realtimeRefreshPromise = null;
+  let riskFeedByRegion = new Map();
+  let riskFeedRequestToken = 0;
+  let riskFeedPending = false;
+  let riskFeedTimer = null;
+  let riskFeedError = "";
 
   const svg = document.getElementById("mapSvg");
   const heroSection = document.getElementById("heroSection");
@@ -163,6 +173,9 @@
   const kpiPlaybook = document.getElementById("kpiPlaybook");
   const industryFeed = document.getElementById("industryFeed");
   const riskSummary = document.getElementById("riskSummary");
+  const riskPanelTitle = document.getElementById("riskPanelTitle");
+  const riskFeedStatusText = document.getElementById("riskFeedStatusText");
+  const refreshRiskFeedButton = document.getElementById("refreshRiskFeedButton");
   const productAdvisor = document.getElementById("productAdvisor");
   const milestoneCoach = document.getElementById("milestoneCoach");
   const salesList = document.getElementById("salesList");
@@ -263,6 +276,38 @@
 
   function formatPercent(value) {
     return `${value >= 0 ? "+" : ""}${Number(value || 0).toFixed(1)}%`;
+  }
+
+  function formatPublishedDate(value) {
+    if (!value) {
+      return "Fecha no disponible";
+    }
+    const parsed = new Date(value);
+    if (Number.isNaN(parsed.getTime())) {
+      return value;
+    }
+    return parsed.toLocaleDateString("es-PR", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+  }
+
+  function formatDateTime(value) {
+    if (!value) {
+      return "sin registro";
+    }
+    const parsed = new Date(value);
+    if (Number.isNaN(parsed.getTime())) {
+      return value;
+    }
+    return parsed.toLocaleString("es-PR", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "numeric",
+      minute: "2-digit",
+    });
   }
 
   function monthLabel(month) {
@@ -418,6 +463,64 @@
     heroMarketingBlock.classList.toggle("hidden", locked);
     loginGate.classList.toggle("hidden", !locked);
     dashboardMain.classList.toggle("hidden", locked);
+  }
+
+  function getRiskPanelRegionLabel() {
+    return selectedRegion === "florida" ? "Florida" : "Puerto Rico";
+  }
+
+  function getRiskFeedPayload() {
+    return riskFeedByRegion.get(selectedRegion) || null;
+  }
+
+  async function refreshRiskFeed(options = {}) {
+    const { silent = false } = options;
+    const region = selectedRegion;
+    const requestToken = ++riskFeedRequestToken;
+    riskFeedPending = true;
+    riskFeedError = "";
+    if (!silent) {
+      renderIndustryFeed();
+    }
+
+    try {
+      const response = await fetch(
+        `/api/risk-feed?region=${encodeURIComponent(region)}&ts=${Date.now()}`,
+        { cache: "no-store" },
+      );
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+
+      const payload = await response.json();
+      if (requestToken !== riskFeedRequestToken) {
+        return;
+      }
+
+      riskFeedByRegion.set(region, {
+        fetchedAt: payload.fetchedAt || new Date().toISOString(),
+        items: Array.isArray(payload.items) ? payload.items : [],
+      });
+    } catch (error) {
+      if (requestToken !== riskFeedRequestToken) {
+        return;
+      }
+      riskFeedError = error.message || "No se pudo consultar internet.";
+    } finally {
+      if (requestToken === riskFeedRequestToken) {
+        riskFeedPending = false;
+        renderIndustryFeed();
+      }
+    }
+  }
+
+  function startRiskFeedRefreshLoop() {
+    if (riskFeedTimer) {
+      window.clearInterval(riskFeedTimer);
+    }
+    riskFeedTimer = window.setInterval(() => {
+      refreshRiskFeed({ silent: true });
+    }, RISK_REFRESH_INTERVAL_MS);
   }
 
   function clearSharedState() {
@@ -646,6 +749,9 @@
       return;
     }
 
+    const normalizedUserEmail = normalizeEmailValue(authUser.email || "");
+    const bootstrapRole = ADMIN_BOOTSTRAP_EMAILS.has(normalizedUserEmail) ? "admin" : "viewer";
+
     let result = await supabase
       .from("profiles")
       .select("*")
@@ -656,10 +762,20 @@
       await supabase.from("profiles").insert({
         user_id: authUser.id,
         workspace_slug: WORKSPACE_SLUG,
-        email: authUser.email,
+        email: normalizedUserEmail,
         full_name: authUser.user_metadata?.full_name || "",
-        role: "viewer",
+        role: bootstrapRole,
       });
+      result = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("user_id", authUser.id)
+        .maybeSingle();
+    } else if (ADMIN_BOOTSTRAP_EMAILS.has(normalizedUserEmail) && result.data.role !== "admin") {
+      await supabase
+        .from("profiles")
+        .update({ role: "admin" })
+        .eq("user_id", authUser.id);
       result = await supabase
         .from("profiles")
         .select("*")
@@ -1487,21 +1603,50 @@
   }
 
   function renderIndustryFeed() {
+    const feedPayload = getRiskFeedPayload();
+    const liveSignals =
+      feedPayload?.items?.length
+        ? feedPayload.items
+        : industrySignals.map((signal) => ({
+            ...signal,
+            publishedAt: null,
+            sourceState: "fallback",
+          }));
     const severityBase = { Media: 2, Alta: 3, Baja: 1 };
-    const scores = industrySignals.map((signal) => {
+    const scores = liveSignals.map((signal) => {
       const exposure = Number(riskAssessments[signal.id] || 2);
       return severityBase[signal.severity] * exposure;
     });
     const totalScore = scores.reduce((sum, score) => sum + score, 0);
     const highCount = scores.filter((score) => score >= 7).length;
+    const liveCount = liveSignals.filter((signal) => signal.sourceState !== "fallback").length;
+
+    if (riskPanelTitle) {
+      riskPanelTitle.textContent = `Radar de industria y entorno en ${getRiskPanelRegionLabel()}`;
+    }
+
+    if (riskFeedStatusText) {
+      if (riskFeedPending) {
+        riskFeedStatusText.textContent =
+          "Buscando en internet las fuentes oficiales más recientes para este análisis.";
+      } else if (feedPayload?.fetchedAt) {
+        riskFeedStatusText.textContent = `Fuentes oficiales consultadas el ${formatDateTime(feedPayload.fetchedAt)}.`;
+      } else if (riskFeedError) {
+        riskFeedStatusText.textContent = `No se pudo consultar internet ahora mismo. Se muestra la capa base del sistema. Detalle: ${riskFeedError}`;
+      } else {
+        riskFeedStatusText.textContent =
+          "El sistema está listo para consultar internet y actualizar las señales de riesgo.";
+      }
+    }
 
     riskSummary.innerHTML = `
       <span class="summary-pill">Riesgo agregado: ${formatNumber(totalScore)}</span>
       <span class="summary-pill">Señales altas: ${formatNumber(highCount)}</span>
-      <span class="summary-pill">Fuentes oficiales: ${formatNumber(industrySignals.length)}</span>
+      <span class="summary-pill">Fuentes oficiales: ${formatNumber(liveSignals.length)}</span>
+      <span class="summary-pill">Web consultada: ${liveCount ? formatDateTime(feedPayload?.fetchedAt) : "pendiente"}</span>
     `;
 
-    industryFeed.innerHTML = industrySignals
+    industryFeed.innerHTML = liveSignals
       .map((signal) => {
         const exposure = riskAssessments[signal.id] || "2";
         const score = (severityBase[signal.severity] || 2) * Number(exposure);
@@ -1509,7 +1654,10 @@
         return `
           <div class="feed-card">
             <strong>${signal.title}</strong>
-            <small class="muted">${signal.category} | Severidad externa ${signal.severity}</small>
+            <div class="feed-meta">
+              <small>${signal.category} | Severidad externa ${signal.severity}</small>
+              <small>${signal.publishedAt ? `Publicado ${formatPublishedDate(signal.publishedAt)}` : "Fecha oficial no disponible"}</small>
+            </div>
             <p>${signal.summary}</p>
             <p class="muted">${signal.whyItMatters}</p>
             <div class="split-fields">
@@ -1526,7 +1674,10 @@
                 <div class="${score >= 7 ? "negative" : score >= 4 ? "neutral" : "positive"}">${scoreLabel}</div>
               </div>
             </div>
-            <a href="${signal.sourceUrl}" target="_blank" rel="noreferrer">${signal.sourceLabel}</a>
+            <div class="feed-source">
+              <small>${signal.sourceState === "fallback" ? "Mostrando configuración base" : "Fuente consultada en internet"}</small>
+              <a href="${signal.sourceUrl}" target="_blank" rel="noreferrer">${signal.sourceLabel}</a>
+            </div>
           </div>
         `;
       })
@@ -2051,6 +2202,7 @@
     populateSelectors();
     syncSalesYearToPeriod();
     updateDashboard();
+    refreshRiskFeed({ silent: true });
   });
 
   periodSelect.addEventListener("change", () => {
@@ -2100,11 +2252,18 @@
   syncNowButton.addEventListener("click", async () => {
     if (isCloudActive() && authSession) {
       await loadCloudData();
-    } else {
-      updateDashboard();
     }
+    await refreshRiskFeed({ silent: true });
+    updateDashboard();
   });
+  if (refreshRiskFeedButton) {
+    refreshRiskFeedButton.addEventListener("click", () => {
+      refreshRiskFeed();
+    });
+  }
 
   await initCloudClient();
+  await refreshRiskFeed({ silent: true });
+  startRiskFeedRefreshLoop();
   updateDashboard();
 })();

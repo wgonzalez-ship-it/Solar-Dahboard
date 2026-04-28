@@ -10,6 +10,13 @@
     <div class="page-shell">
       <header class="hero" id="heroSection">
         <div class="hero-copy-block" id="heroMarketingBlock">
+          <div class="hero-brand-wrap">
+            <img
+              class="hero-brand-image"
+              src="assets/solaris-power-branding.png"
+              alt="Solaris Power"
+            />
+          </div>
           <p class="eyebrow">Solaris Power Dealer Intelligence</p>
           <h1>Puerto Rico, ventas, expansión y riesgos en una sola vista.</h1>
           <p class="hero-copy">
@@ -34,12 +41,11 @@
                 <button data-view="expansion">Expansión</button>
               </div>
             </div>
-            <div class="brand-sun">
-              <span></span>
-              <span></span>
-              <span></span>
-              <span></span>
-            </div>
+            <img
+              class="hero-panel-brand"
+              src="assets/solaris-power-branding.png"
+              alt="Solaris Power"
+            />
           </div>
           <p class="hero-panel-note" id="viewModeDescription">
             Estado general del dealer: facturación, cobertura, talento,
@@ -462,9 +468,13 @@
               <div class="card-header compact">
                 <div>
                   <p class="card-kicker">Riesgos externos</p>
-                  <h2>Radar de industria en Puerto Rico</h2>
+                  <h2 id="riskPanelTitle">Radar de industria y entorno</h2>
                 </div>
+                <button id="refreshRiskFeedButton" class="secondary-button">Actualizar web</button>
               </div>
+              <p class="microcopy risk-status" id="riskFeedStatusText">
+                Consultando fuentes oficiales en internet.
+              </p>
               <div class="risk-summary" id="riskSummary"></div>
               <div id="industryFeed" class="feed-grid"></div>
             </article>

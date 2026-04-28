@@ -227,47 +227,19 @@ input {
   padding: 32px;
   position: relative;
   overflow: hidden;
+  display: grid;
+  align-content: start;
 }
 
-.hero-copy-block::after {
-  content: "";
-  position: absolute;
-  width: 240px;
-  height: 240px;
-  right: -70px;
-  top: -70px;
-  border-radius: 50%;
-  background:
-    radial-gradient(circle, rgba(255, 213, 74, 0.75) 0 18%, transparent 18%),
-    conic-gradient(
-      from 0deg,
-      rgba(255, 213, 74, 0.92) 0deg 14deg,
-      transparent 14deg 28deg,
-      rgba(255, 213, 74, 0.92) 28deg 42deg,
-      transparent 42deg 56deg,
-      rgba(255, 213, 74, 0.92) 56deg 70deg,
-      transparent 70deg 84deg,
-      rgba(255, 213, 74, 0.92) 84deg 98deg,
-      transparent 98deg 112deg,
-      rgba(255, 213, 74, 0.92) 112deg 126deg,
-      transparent 126deg 140deg,
-      rgba(255, 213, 74, 0.92) 140deg 154deg,
-      transparent 154deg 168deg,
-      rgba(255, 213, 74, 0.92) 168deg 182deg,
-      transparent 182deg 196deg,
-      rgba(255, 213, 74, 0.92) 196deg 210deg,
-      transparent 210deg 224deg,
-      rgba(255, 213, 74, 0.92) 224deg 238deg,
-      transparent 238deg 252deg,
-      rgba(255, 213, 74, 0.92) 252deg 266deg,
-      transparent 266deg 280deg,
-      rgba(255, 213, 74, 0.92) 280deg 294deg,
-      transparent 294deg 308deg,
-      rgba(255, 213, 74, 0.92) 308deg 322deg,
-      transparent 322deg 336deg,
-      rgba(255, 213, 74, 0.92) 336deg 360deg
-    );
-  opacity: 0.18;
+.hero-brand-wrap {
+  margin-bottom: 18px;
+}
+
+.hero-brand-image {
+  width: clamp(190px, 23vw, 280px);
+  height: auto;
+  display: block;
+  filter: drop-shadow(0 18px 28px rgba(0, 0, 0, 0.24));
 }
 
 .hero-panel {
@@ -318,36 +290,17 @@ input {
 .hero-panel-top {
   display: flex;
   justify-content: space-between;
+  align-items: flex-start;
   gap: 16px;
 }
 
-.brand-sun {
-  position: relative;
-  width: 88px;
-  height: 88px;
-  border-radius: 50%;
-  background: radial-gradient(circle, var(--accent) 0 26%, transparent 26%),
-    radial-gradient(circle at center, rgba(45, 103, 167, 0.95) 26% 58%, transparent 58%);
-  box-shadow: inset 0 0 0 10px rgba(45, 103, 167, 0.35);
-}
-
-.brand-sun span {
-  position: absolute;
-  inset: -18px;
-  background: conic-gradient(from 0deg, rgba(255, 213, 74, 0.9) 0 8deg, transparent 8deg 30deg);
-  border-radius: 50%;
-}
-
-.brand-sun span:nth-child(2) {
-  transform: rotate(90deg);
-}
-
-.brand-sun span:nth-child(3) {
-  transform: rotate(180deg);
-}
-
-.brand-sun span:nth-child(4) {
-  transform: rotate(270deg);
+.hero-panel-brand {
+  width: 116px;
+  min-width: 116px;
+  height: auto;
+  display: block;
+  opacity: 0.96;
+  filter: drop-shadow(0 16px 24px rgba(0, 0, 0, 0.22));
 }
 
 .eyebrow,
@@ -877,6 +830,10 @@ option {
   color: #ffe89a;
 }
 
+.risk-status {
+  margin-bottom: 12px;
+}
+
 .risk-summary {
   display: flex;
   gap: 12px;
@@ -891,6 +848,28 @@ option {
   color: var(--muted);
   font-size: 0.84rem;
   border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.feed-meta,
+.feed-source {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.feed-meta {
+  margin-bottom: 10px;
+}
+
+.feed-source {
+  margin-top: 10px;
+}
+
+.feed-source small,
+.feed-meta small {
+  color: var(--muted);
 }
 
 .advisor-list {
@@ -1037,6 +1016,18 @@ option {
   .hero-stats,
   .auth-session {
     grid-template-columns: 1fr;
+  }
+
+  .hero-panel-top,
+  .feed-meta,
+  .feed-source {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .hero-panel-brand {
+    width: 96px;
+    min-width: 96px;
   }
 
   h1 {
